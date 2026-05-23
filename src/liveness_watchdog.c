@@ -25,7 +25,13 @@ static const char *TAG = "Liveness";
 #define LIVENESS_TICK_MS 10000
 #define LIVENESS_FAIL_THRESHOLD 6     // 6 * 10s = ~60s grace
 #define LIVENESS_HEAP_FLOOR_BYTES 16384
-#define LIVENESS_STA_NO_IP_GRACE_TICKS 30 // 5 min before restarting for "STA configured but never came up"
+
+// STA outages can be legitimate (upstream AP is genuinely down for hours).
+// Rebooting on STA-only failure takes the soft-AP down too, which removes the
+// user's ability to reach the web UI to diagnose. So we only reboot for STA
+// after a long grace, treating a multi-hour stuck STA as a likely radio wedge
+// worth clearing. Tune to taste.
+#define LIVENESS_STA_NO_IP_GRACE_TICKS 360 // 60 min
 
 // ---- STA reconnect backoff ---------------------------------------------------
 
